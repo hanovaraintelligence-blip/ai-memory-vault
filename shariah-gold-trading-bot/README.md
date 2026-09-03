@@ -53,6 +53,35 @@ python bot.py --live
 `false` (or pass `--live`) only once you understand and accept the strategy
 and its risks.
 
+## Backtesting
+
+Before running the bot live, replay the strategy against historical OHLCV
+data with `backtest.py`. It reuses the exact same SMA/crossover functions as
+`bot.py`, so the result reflects what the live bot would actually have done.
+It never places any orders — it only reads historical price data.
+
+```bash
+# Against a local OHLCV CSV (timestamp,open,high,low,close,volume — timestamp
+# can be epoch milliseconds or an ISO 8601 / YYYY-MM-DD date)
+python backtest.py --csv path/to/candles.csv \
+  --short-window 10 --long-window 30 \
+  --starting-balance 1000 --quote-amount-per-buy 100 --fee-rate 0.001
+
+# Or fetch historical candles live via ccxt (spot markets only)
+python backtest.py --exchange binance --symbol PAXG/USDT --timeframe 1h \
+  --since 2024-01-01 --until 2024-06-01
+```
+
+This prints total return, a buy-and-hold comparison, trade count, win rate,
+and max drawdown, and can optionally write the full equity curve to CSV with
+`--csv-out equity.csv`. The simulation is cash-based (starts with a
+quote-currency balance; buys spend cash it has, sells liquidate only the
+base balance actually held), so — like the live bot — there is nothing to
+simulate that would require leverage or shorting.
+
+Backtested performance on historical data is not a guarantee of future
+results.
+
 ## Choosing a symbol
 
 Use a **spot-settled** gold instrument your exchange actually lists, for
@@ -67,8 +96,9 @@ pip install pytest
 pytest tests/
 ```
 
-The tests cover the SMA calculation and crossover-signal logic; they don't
-touch any exchange or network.
+The tests cover the SMA calculation, crossover-signal logic, and the
+backtest simulation (trade execution, fees, drawdown, CSV loading); they
+don't touch any exchange or network.
 
 ## Disclaimer
 
