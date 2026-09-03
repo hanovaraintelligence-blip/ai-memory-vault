@@ -1,9 +1,10 @@
 """
-Backtest the SMA-crossover strategy from bot.py against historical OHLCV data.
+Backtest the SMA-crossover strategy (strategy.py) against historical OHLCV data.
 
 Reuses the exact same `simple_moving_average` / `detect_crossover_signal`
-functions the live bot uses, so a backtest result reflects what the live bot
-would actually have done — not a separate reimplementation that could drift.
+functions the live bots (bot.py for ccxt spot, mt5_bot.py for MetaTrader 5)
+use, so a backtest result reflects what a live bot would actually have
+done — not a separate reimplementation that could drift.
 
 Simulation stays within the same Shariah constraints as the live bot: it is
 a cash-based spot simulation (starts with a quote-currency balance, buys
@@ -27,7 +28,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Optional, Sequence
 
-from bot import Signal, detect_crossover_signal, simple_moving_average
+from strategy import Signal, detect_crossover_signal, simple_moving_average
 
 log = logging.getLogger("shariah_gold_backtest")
 
@@ -42,8 +43,10 @@ def _parse_timestamp(value: str) -> int:
     """Parse an epoch-milliseconds string, or an ISO 8601 / YYYY-MM-DD date,
     into epoch milliseconds (UTC)."""
     value = value.strip()
-    if value.isdigit():
+    try:
         return int(value)
+    except ValueError:
+        pass
 
     dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if dt.tzinfo is None:

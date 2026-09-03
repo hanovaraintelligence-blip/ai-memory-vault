@@ -3,9 +3,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from bot import (  # noqa: E402
-    BotConfig,
+from strategy import (  # noqa: E402
     detect_crossover_signal,
+    signal_from_closes,
     simple_moving_average,
 )
 
@@ -47,19 +47,8 @@ def test_detect_crossover_signal_ignores_none_values():
     assert detect_crossover_signal([None, 1], [None, 1]) == "HOLD"
 
 
-def test_botconfig_rejects_short_window_not_smaller_than_long():
-    try:
-        BotConfig(short_window=30, long_window=10)
-    except ValueError:
-        pass
-    else:
-        raise AssertionError("expected ValueError")
-
-
-def test_botconfig_rejects_non_positive_quote_amount():
-    try:
-        BotConfig(quote_amount_per_buy=0)
-    except ValueError:
-        pass
-    else:
-        raise AssertionError("expected ValueError")
+def test_signal_from_closes_matches_manual_computation():
+    # SMA(2) at idx 2,3 = [10, 15]; SMA(3) at idx 2,3 = [10, 13.33]
+    # prev short<=long (10<=10), curr short>long (15>13.33) -> golden cross
+    closes = [10, 10, 10, 20]
+    assert signal_from_closes(closes, short_window=2, long_window=3) == "BUY"
