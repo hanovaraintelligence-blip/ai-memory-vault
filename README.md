@@ -25,6 +25,10 @@ Starter files for the system. Every spot that needs your information is marked `
 - **[DAILY-NOTE.md](templates/DAILY-NOTE.md):** the daily-note template. Goes **inside your vault** at `01 - Daily Notes/Daily Note Template.md`. Every daily note gets created from it, so the log keeps one consistent, scannable shape.
 - **[MEMORY.md](templates/MEMORY.md):** the pointer for Claude Code's own memory. Goes in **Claude Code's project folder** (`~/.claude/projects/...`, not your vault). It redirects the native memory back into the vault so you never end up with two memory layers that drift apart.
 
+## Extras
+
+- **[shariah-gold-trading-bot/](shariah-gold-trading-bot/):** a standalone, Shariah-compliant SMA-crossover bot for spot gold trading (spot only, no leverage, no shorting). See its own README for setup and compliance notes.
+
 ## Support
 
 Free to use, and always will be. If this helped you out, you can buy me a coffee:
