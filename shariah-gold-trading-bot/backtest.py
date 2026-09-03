@@ -42,8 +42,10 @@ def _parse_timestamp(value: str) -> int:
     """Parse an epoch-milliseconds string, or an ISO 8601 / YYYY-MM-DD date,
     into epoch milliseconds (UTC)."""
     value = value.strip()
-    if value.isdigit():
+    try:
         return int(value)
+    except ValueError:
+        pass
 
     dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
     if dt.tzinfo is None:

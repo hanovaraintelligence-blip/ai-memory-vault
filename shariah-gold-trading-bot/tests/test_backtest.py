@@ -8,6 +8,7 @@ import pytest  # noqa: E402
 from backtest import (  # noqa: E402
     BacktestConfig,
     Trade,
+    _parse_timestamp,
     load_ohlcv_csv,
     max_drawdown_pct,
     run_backtest,
@@ -155,6 +156,13 @@ def test_load_ohlcv_csv_round_trip(tmp_path):
     # sorted by timestamp; the two rows sharing a timestamp keep file order
     assert candles[0][0] == candles[1][0] == 1704067200000
     assert candles[-1][4] == 12.0
+
+
+def test_parse_timestamp_handles_pre_1970_epoch_millis():
+    # Regression test: str.isdigit() returns False for a leading "-", so a
+    # negative epoch-ms timestamp (any date before 1970) used to fall through
+    # to the ISO-8601 parser and raise ValueError instead of being read.
+    assert _parse_timestamp("-315619200000") == -315619200000
 
 
 def test_load_ohlcv_csv_rejects_missing_columns(tmp_path):
